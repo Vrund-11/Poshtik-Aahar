@@ -1,0 +1,563 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #fcf9f3;
+    color: #1c1c18;
+    font-family: 'Work Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.font-sora {
+  font-family: 'Anton', sans-serif !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.02em !important;
+}
+
+.font-hanken {
+  font-family: 'Work Sans', sans-serif !important;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.fill-icon {
+  font-variation-settings: 'FILL' 1;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Crisp 1px borders instead of thick neobrutalist borders */
+body:not(.auth-page-active) .chunky-border, 
+body:not(.auth-page-active) .thick-border,
+body:not(.auth-page-active) [class*="chunky-border"], 
+body:not(.auth-page-active) [class*="thick-border"],
+body:not(.auth-page-active) .border-2.border-black, 
+body:not(.auth-page-active) .border-3.border-black, 
+body:not(.auth-page-active) .border-4.border-black,
+body:not(.auth-page-active) .border-2.border-primary, 
+body:not(.auth-page-active) .border-3.border-primary, 
+body:not(.auth-page-active) .border-4.border-primary,
+body:not(.auth-page-active) .border-\[3px\] {
+  border: 1px solid #E9E2D5 !important;
+}
+
+body:not(.auth-page-active) .border-black, 
+body:not(.auth-page-active) .border-primary,
+body:not(.auth-page-active) [class*="border-black"], 
+body:not(.auth-page-active) [class*="border-primary"] {
+  border-color: #E9E2D5 !important;
+}
+
+/* Box shadow overrides: flat look instead of neobrutalist offset shadow */
+body:not(.auth-page-active) .chunky-shadow, 
+body:not(.auth-page-active) .chunky-shadow-sm, 
+body:not(.auth-page-active) .neo-shadow,
+body:not(.auth-page-active) [class*="chunky-shadow"], 
+body:not(.auth-page-active) [class*="chunky-shadow-sm"], 
+body:not(.auth-page-active) [class*="neo-shadow"],
+body:not(.auth-page-active) [class*="shadow-[4px_4px_0px_#000000]"], 
+body:not(.auth-page-active) [class*="shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"], 
+body:not(.auth-page-active) [class*="shadow-[6px_6px_0px_0px_rgba(110,231,183,1)]"], 
+body:not(.auth-page-active) [class*="shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"],
+body:not(.auth-page-active) [class*="shadow-[8px_8px_0px_0px_rgba(253,224,71,1)]"], 
+body:not(.auth-page-active) [class*="shadow-[4px_4px_0px_#000]"] {
+  box-shadow: none !important;
+}
+
+/* Ambient soft hover shadows for cards & interactive items (tinted with primary orange) */
+body:not(.auth-page-active) .active-chunky, 
+body:not(.auth-page-active) .neo-shadow-active,
+body:not(.auth-page-active) a, 
+body:not(.auth-page-active) button, 
+body:not(.auth-page-active) [class*="cursor-pointer"], 
+body:not(.auth-page-active) [class*="active-chunky"] {
+  transition: all 0.2s ease-in-out;
+}
+
+body:not(.auth-page-active) .active-chunky:hover, 
+body:not(.auth-page-active) .neo-shadow-active:hover,
+body:not(.auth-page-active) a:hover, 
+body:not(.auth-page-active) button:hover, 
+body:not(.auth-page-active) [class*="cursor-pointer"]:hover {
+  box-shadow: 0 4px 12px rgba(255, 95, 31, 0.1) !important;
+}
+
+body:not(.auth-page-active) .active-chunky:active, 
+body:not(.auth-page-active) .neo-shadow-active:active, 
+body:not(.auth-page-active) a:active, 
+body:not(.auth-page-active) button:active, 
+body:not(.auth-page-active) [class*="cursor-pointer"]:active {
+  transform: scale(0.98) !important;
+  box-shadow: none !important;
+}
+
+/* Enforce sharp corners (no rounding) on primary and secondary buttons */
+body:not(.auth-page-active) button.bg-primary, 
+body:not(.auth-page-active) button[class*="bg-primary"],
+body:not(.auth-page-active) a.bg-primary,
+body:not(.auth-page-active) a[class*="bg-primary"],
+body:not(.auth-page-active) .bg-primary.text-white,
+body:not(.auth-page-active) button.bg-secondary,
+body:not(.auth-page-active) button[class*="bg-secondary"] {
+  border-radius: 0px !important;
+  background-color: #ff5f1f !important; /* Vibrant Orange Primary CTA */
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* Secondary CTA / Terracotta outline buttons */
+body:not(.auth-page-active) button.bg-white.text-primary,
+body:not(.auth-page-active) button.border-primary.text-primary,
+body:not(.auth-page-active) button[class*="border-primary"],
+body:not(.auth-page-active) a.bg-white.text-primary,
+body:not(.auth-page-active) button.border-secondary.text-secondary {
+  background-color: transparent !important;
+  color: #8c4f27 !important; /* Umami Brown / Secondary */
+  border: 1px solid #8c4f27 !important;
+  border-radius: 0px !important;
+}
+
+/* Input elements: solid white bg, 1px oatmeal border, 4px radius */
+body:not(.auth-page-active) input:not(.bg-transparent), 
+body:not(.auth-page-active) textarea, 
+body:not(.auth-page-active) select {
+  background-color: #ffffff !important;
+  border: 1px solid #E9E2D5 !important;
+  border-radius: 4px !important;
+}
+
+/* Tonal layers & Card overrides: cards pop as white against oatmeal neutral canvas */
+body:not(.auth-page-active) .bg-white, 
+body:not(.auth-page-active) [class*="bg-white"] {
+  background-color: #ffffff !important;
+}
+
+/* Custom mapping of arbitrary background colors used across screens */
+body:not(.auth-page-active) .bg-\[\#FEF3C7\], 
+body:not(.auth-page-active) [class*="bg-[#FEF3C7]"],
+body:not(.auth-page-active) .bg-\[\#FEF3C7\/50\], 
+body:not(.auth-page-active) [class*="bg-[#FEF3C7]/50"] {
+  background-color: #fcf9f3 !important; /* oatmeal background */
+}
+
+body:not(.auth-page-active) .bg-\[\#FFEDD5\], 
+body:not(.auth-page-active) [class*="bg-[#FFEDD5]"],
+body:not(.auth-page-active) .bg-\[\#FFEDD5\/25\], 
+body:not(.auth-page-active) [class*="bg-[#FFEDD5]/25"],
+body:not(.auth-page-active) .bg-\[\#FFEDD5\/40\], 
+body:not(.auth-page-active) [class*="bg-[#FFEDD5]/40"] {
+  background-color: #f0eee8 !important; /* surface-container */
+}
+
+body:not(.auth-page-active) .bg-\[\#D1FAE5\], 
+body:not(.auth-page-active) [class*="bg-[#D1FAE5]"],
+body:not(.auth-page-active) .bg-\[\#D1FAE5\/40\], 
+body:not(.auth-page-active) [class*="bg-[#D1FAE5]/40"],
+body:not(.auth-page-active) .bg-\[\#D1FAE5\/30\], 
+body:not(.auth-page-active) [class*="bg-[#D1FAE5]/30"] {
+  background-color: #f6f3ed !important; /* surface-container-low */
+}
+
+body:not(.auth-page-active) .bg-\[\#F3E8FF\], 
+body:not(.auth-page-active) [class*="bg-[#F3E8FF]"],
+body:not(.auth-page-active) .bg-\[\#F3E8FF\/40\], 
+body:not(.auth-page-active) [class*="bg-[#F3E8FF]/40"],
+body:not(.auth-page-active) .bg-\[\#F3E8FF\/80\], 
+body:not(.auth-page-active) [class*="bg-[#F3E8FF]/80"] {
+  background-color: #ebe8e2 !important; /* surface-container-high */
+}
+
+body:not(.auth-page-active) .bg-\[\#F3F4F6\], 
+body:not(.auth-page-active) [class*="bg-[#F3F4F6]"] {
+  background-color: #fcf9f3 !important; /* oatmeal neutral background */
+}
+
+/* Food Mood Background Gradient mapping */
+.food-mood-bg {
+  background: linear-gradient(135deg, #f6f3ed 0%, #fcf9f3 50%, #ebe8e2 100%) !important;
+  background-size: 400% 400% !important;
+  animation: gradientShift 15s ease infinite !important;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid #E9E2D5 !important;
+}
+
+.brand-text-stroke {
+  -webkit-text-stroke: 1.5px #1c1c18 !important;
+  color: transparent !important;
+}
+
+/* Desktop layout scaling - Make it wide enough like Zomato on desktop screens */
+@media (min-width: 768px) {
+  /* Expand layout structures to standard desktop containers */
+  body header, 
+  body main, 
+  body footer, 
+  body nav:not([class*="stepper"]):not([class*="quantity"]) {
+    max-width: 1280px !important;
+    width: 100% !important;
+  }
+  
+  /* Make narrow viewports wide on desktop */
+  .max-w-md, [class*="max-w-md"],
+  .max-w-4xl, [class*="max-w-4xl"],
+  .max-w-xl, [class*="max-w-xl"] {
+    max-width: 1140px !important;
+  }
+
+  /* Adjust centered layout structures (fixed headers, navigations, checkout bars) */
+  header.fixed, footer.fixed, nav.fixed,
+  [class*="fixed"].bottom-0, [class*="fixed"].top-0 {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: 1140px !important;
+    right: auto !important;
+  }
+
+  /* Transform 1-column layout lists to 2-columns on wide desktop viewports */
+  .grid-cols-1, [class*="grid-cols-1"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Exclude modular popups, drawers, sliders, and auth screens from layout stretching */
+  .modal, [class*="modal"], [class*="drawer"], [class*="popup"], 
+  [class*="rounded-t-3xl"], [class*="w-96"], [class*="w-80"],
+  [class*="max-h-[85vh]"], [class*="max-w-md"].modal,
+  .bg-white.w-full.max-w-md {
+    max-width: 448px !important;
+  }
+
+  /* Keep login/register pages narrow & centered for standard desktop forms */
+  main[class*="pb-12"].relative.z-10 {
+    max-width: 448px !important;
+    margin: 0 auto !important;
+  }
+}
+
+.jagged-edge {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 98% 93%, 96% 95%, 94% 93%, 92% 95%, 90% 93%, 88% 95%, 86% 93%, 84% 95%, 82% 93%, 80% 95%, 78% 93%, 76% 95%, 74% 93%, 72% 95%, 70% 93%, 68% 95%, 66% 93%, 64% 95%, 62% 93%, 60% 95%, 58% 93%, 56% 95%, 54% 93%, 52% 95%, 50% 93%, 48% 95%, 46% 93%, 44% 95%, 42% 93%, 40% 95%, 38% 93%, 36% 95%, 34% 93%, 32% 95%, 30% 93%, 28% 95%, 26% 93%, 24% 95%, 22% 93%, 20% 95%, 18% 93%, 16% 95%, 14% 93%, 12% 95%, 10% 93%, 8% 95%, 6% 93%, 4% 95%, 2% 93%, 0% 95%);
+}
+
+/* Scoped Auth Page styling overrides to perfectly replicate notes design */
+.auth-page {
+  /* Font families */
+  --font-anton: 'Anton', sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  
+  font-family: var(--font-jakarta) !important;
+}
+
+.auth-page .font-display-md,
+.auth-page .font-headline-lg,
+.auth-page .font-display-lg,
+.auth-page .font-anton {
+  font-family: var(--font-anton) !important;
+}
+
+.auth-page .font-label-lg,
+.auth-page .font-body-md,
+.auth-page .font-body-lg,
+.auth-page .font-headline-sm,
+.auth-page .font-label-sm {
+  font-family: var(--font-jakarta) !important;
+}
+
+/* Custom Spacing */
+.auth-page .p-gutter {
+  padding: 24px !important;
+}
+.auth-page .px-gutter {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+.auth-page .py-gutter {
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+}
+.auth-page .p-margin {
+  padding: 32px !important;
+}
+.auth-page .px-margin {
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+.auth-page .py-margin {
+  padding-top: 32px !important;
+  padding-bottom: 32px !important;
+}
+.auth-page .p-lg {
+  padding: 48px !important;
+}
+.auth-page .mb-xl {
+  margin-bottom: 80px !important;
+}
+.auth-page .mb-lg {
+  margin-bottom: 48px !important;
+}
+.auth-page .mt-lg {
+  margin-top: 48px !important;
+}
+.auth-page .py-lg {
+  padding-top: 48px !important;
+  padding-bottom: 48px !important;
+}
+.auth-page .space-y-md > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(24px * calc(1 - var(--tw-space-y-reverse))) !important;
+  margin-bottom: calc(24px * var(--tw-space-y-reverse)) !important;
+}
+.auth-page .space-y-gutter > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: 24px !important;
+  margin-bottom: 0px !important;
+}
+.auth-page .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: 24px !important;
+  margin-bottom: 0px !important;
+}
+.auth-page .gap-base {
+  gap: 8px !important;
+}
+.auth-page .gap-sm {
+  gap: 12px !important;
+}
+.auth-page .gap-md {
+  gap: 24px !important;
+}
+.auth-page .mb-xs {
+  margin-bottom: 4px !important;
+}
+.auth-page .mt-xs {
+  margin-top: 4px !important;
+}
+.auth-page .ml-base {
+  margin-left: 8px !important;
+}
+.auth-page .ml-4 {
+  margin-left: 16px !important;
+}
+.auth-page .px-md {
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+.auth-page .py-base {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.auth-page .px-base {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+.auth-page .pt-base {
+  padding-top: 8px !important;
+}
+.auth-page .pt-sm {
+  padding-top: 12px !important;
+}
+.auth-page .pt-4 {
+  padding-top: 16px !important;
+}
+.auth-page .mt-margin {
+  margin-top: 32px !important;
+}
+.auth-page .fixed.top-margin {
+  top: 32px !important;
+}
+.auth-page .fixed.left-margin {
+  left: 32px !important;
+}
+.auth-page .fixed.bottom-margin {
+  bottom: 32px !important;
+}
+
+/* Custom colors mapped specifically for .auth-page components */
+.auth-page.bg-background, .auth-page .bg-background {
+  background-color: #fff8f0 !important;
+}
+.auth-page .text-primary {
+  color: #b02f00 !important;
+}
+.auth-page .bg-primary {
+  background-color: #b02f00 !important;
+}
+.auth-page .text-on-surface-variant {
+  color: #5b4039 !important;
+}
+.auth-page .text-on-surface {
+  color: #1f1b10 !important;
+}
+.auth-page .bg-surface-container-low {
+  background-color: #fcf3e1 !important;
+}
+.auth-page .border-secondary {
+  border-color: #7c544e !important;
+}
+.auth-page .bg-surface-container-lowest {
+  background-color: #ffffff !important;
+}
+.auth-page .bg-primary-container {
+  background-color: #ff5722 !important;
+}
+.auth-page .text-on-primary-container {
+  color: #541200 !important;
+}
+.auth-page .border-outline-variant {
+  border-color: #e4beb4 !important;
+}
+.auth-page .border-surface-variant {
+  border-color: #eae2d0 !important;
+}
+.auth-page .bg-surface-dim {
+  background-color: #e2d9c8 !important;
+}
+.auth-page .bg-secondary-container {
+  background-color: #fdc8bf !important;
+}
+.auth-page .text-outline {
+  color: #907067 !important;
+}
+.auth-page .bg-surface-bright {
+  background-color: #fff8f0 !important;
+}
+.auth-page .text-secondary {
+  color: #7c544e !important;
+}
+.auth-page .border-on-surface {
+  border-color: #1f1b10 !important;
+}
+.auth-page .bg-surface-container {
+  background-color: #f6eddb !important;
+}
+.auth-page .bg-surface-container-high {
+  background-color: #f0e7d5 !important;
+}
+.auth-page .bg-surface-container-highest {
+  background-color: #eae2d0 !important;
+}
+.auth-page .text-primary-fixed-dim {
+  color: #ffb5a0 !important;
+}
+.auth-page .border-on-secondary-fixed-variant\/10 {
+  border-color: rgba(98, 61, 55, 0.1) !important;
+}
+
+/* Custom Font Sizes and styles */
+.auth-page .text-display-md {
+  font-size: 48px !important;
+  line-height: 52px !important;
+  letter-spacing: -0.01em !important;
+  font-weight: 400 !important;
+}
+.auth-page .text-display-lg {
+  font-size: 72px !important;
+  line-height: 72px !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 400 !important;
+}
+.auth-page .text-headline-lg {
+  font-size: 32px !important;
+  line-height: 36px !important;
+  font-weight: 400 !important;
+}
+.auth-page .text-headline-sm {
+  font-size: 20px !important;
+  line-height: 28px !important;
+  font-weight: 700 !important;
+}
+.auth-page .text-label-lg {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+}
+.auth-page .text-body-md {
+  font-size: 16px !important;
+  line-height: 24px !important;
+  font-weight: 400 !important;
+}
+.auth-page .text-body-lg {
+  font-size: 18px !important;
+  line-height: 28px !important;
+  font-weight: 400 !important;
+}
+.auth-page .text-label-sm {
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 700 !important;
+}
+
+/* Shadows and utility overrides */
+.auth-page .vibrant-shadow {
+  box-shadow: 0 4px 20px rgba(176, 47, 0, 0.15) !important;
+}
+.auth-page .umami-shadow {
+  box-shadow: 0 12px 40px 0 rgba(62, 31, 26, 0.08) !important;
+}
+.auth-page input:not(.bg-transparent) {
+  transition: all 0.2s ease-in-out !important;
+  outline: none !important;
+  border-radius: 9999px !important; /* ensure rounded-full works */
+}
+.auth-page input:not(.bg-transparent):focus {
+  border-color: #b02f00 !important;
+  box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.2) !important;
+}
+.auth-page input.bg-transparent {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.auth-page .input-pill {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.auth-page .input-pill:focus-within {
+  border-color: #ff5722 !important;
+  transform: translateY(-1px);
+}
+.auth-page .btn-active-scale:active {
+  transform: scale(0.96) !important;
+}
+.auth-page .btn-press:active {
+  transform: scale(0.96) !important;
+}
+
+/* Ticket edge jagged and custom scrollbar classes */
+.auth-page .ticket-edge {
+  clip-path: polygon(100% 0, 100% 95%, 98% 100%, 96% 95%, 94% 100%, 92% 95%, 90% 100%, 88% 95%, 86% 100%, 84% 95%, 82% 100%, 80% 95%, 78% 100%, 76% 95%, 74% 100%, 72% 95%, 70% 100%, 68% 95%, 66% 100%, 64% 95%, 62% 100%, 60% 95%, 58% 100%, 56% 95%, 54% 100%, 52% 95%, 50% 100%, 48% 95%, 46% 100%, 44% 95%, 42% 100%, 40% 95%, 38% 100%, 36% 95%, 34% 100%, 32% 95%, 30% 100%, 28% 95%, 26% 100%, 24% 95%, 22% 100%, 20% 95%, 18% 100%, 16% 95%, 14% 100%, 12% 95%, 10% 100%, 8% 95%, 6% 100%, 4% 95%, 2% 100%, 0 95%, 0 0);
+}
+.auth-page .ticket-jagged {
+  position: relative;
+  background-color: #f6eddb;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 95%, 98% 100%, 96% 95%, 94% 100%, 92% 95%, 90% 100%, 88% 95%, 86% 100%, 84% 95%, 82% 100%, 80% 95%, 78% 100%, 76% 95%, 74% 100%, 72% 95%, 70% 100%, 68% 95%, 66% 100%, 64% 95%, 62% 100%, 60% 95%, 58% 100%, 56% 95%, 54% 100%, 52% 95%, 50% 100%, 48% 95%, 46% 100%, 44% 95%, 42% 100%, 40% 95%, 38% 100%, 36% 95%, 34% 100%, 32% 95%, 30% 100%, 28% 95%, 26% 100%, 24% 95%, 22% 100%, 20% 95%, 18% 100%, 16% 95%, 14% 100%, 12% 95%, 10% 100%, 8% 95%, 6% 100%, 4% 95%, 2% 100%, 0% 95%);
+}
+.auth-page .custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.auth-page .custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.auth-page .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #907067;
+  border-radius: 10px;
+}
+
+

@@ -1,0 +1,721 @@
+# Database Schema
+## Restaurant Experience OS — MVP
+**Version:** 1.0  
+**Engine:** PostgreSQL 15 via Supabase  
+**ORM:** Prisma  
+**Last Updated:** June 2026
+
+---
+
+## Prisma Schema
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Plan {
+  TRIAL
+  BASIC
+  GROWTH
+  SUSPENDED
+}
+
+enum RestaurantStatus {
+  ACTIVE
+  TRIAL
+  EXPIRED
+  SUSPENDED
+}
+
+enum StaffRole {
+  OWNER
+  MANAGER
+  CHEF
+}
+
+enum TableStatus {
+  AVAILABLE
+  SEATED
+  ORDER_PENDING
+  PREPARING
+  READY
+  SERVED
+  BILL_REQUESTED
+  PAYMENT_PENDING
+  COMPLETED
+}
+
+enum SessionStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  BILL_REQUESTED
+  PAYMENT_PENDING
+  CLOSED
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  READY
+  SERVED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  SEATED
+  LEFT
+}
+
+enum ComplaintCategory {
+  FOOD_QUALITY
+  SERVICE
+  WAIT_TIME
+  BILLING
+  CLEANLINESS
+  STAFF_BEHAVIOR
+  ORDER_ACCURACY
+  OTHER
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum LoyaltyTxType {
+  EARNED
+  REDEEMED
+  BONUS
+  EXPIRED
+}
+
+// ─────────────────────────────────────────────
+// ADMIN
+// ─────────────────────────────────────────────
+
+model Admin {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions     AdminSession[]
+}
+
+model AdminSession {
+  id           String   @id @default(cuid())
+  adminId      String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  admin        Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// CUSTOMER
+// ─────────────────────────────────────────────
+
+model Customer {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String   @unique
+  email        String   @unique
+  passwordHash String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions        CustomerSession[]
+  tableSessions   TableSession[]
+  orders          Order[]
+  reservations    Reservation[]
+  loyaltyAccount  LoyaltyAccount?
+  complaints      Complaint[]
+}
+
+model CustomerSession {
+  id           String   @id @default(cuid())
+  customerId   String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// RESTAURANT
+// ─────────────────────────────────────────────
+
+model Restaurant {
+  id              String           @id @default(cuid())
+  name            String
+  description     String?
+  cuisineType     String?
+  logoUrl         String?
+  status          RestaurantStatus @default(TRIAL)
+  plan            Plan             @default(TRIAL)
+  planExpiresAt   DateTime
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  branches        Branch[]
+  staff           Staff[]
+  menus           Menu[]
+  loyaltyConfig   LoyaltyConfig?
+  complaints      Complaint[]
+  photos          RestaurantPhoto[]
+}
+
+model RestaurantPhoto {
+  id           String   @id @default(cuid())
+  restaurantId String
+  url          String
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// BRANCH / FLOOR / TABLE
+// ─────────────────────────────────────────────
+
+model Branch {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  address      String
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  floors       Floor[]
+  queues       Queue[]
+  reservations Reservation[]
+}
+
+model Floor {
+  id        String   @id @default(cuid())
+  branchId  String
+  name      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  branch    Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  tables    Table[]
+}
+
+model Table {
+  id        String      @id @default(cuid())
+  floorId   String
+  number    Int
+  capacity  Int
+  status    TableStatus @default(AVAILABLE)
+  qrCode    String      @unique @default(cuid())
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  floor     Floor         @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  sessions  TableSession[]
+
+  @@unique([floorId, number])
+}
+
+// ─────────────────────────────────────────────
+// STAFF
+// ─────────────────────────────────────────────
+
+model Staff {
+  id           String    @id @default(cuid())
+  restaurantId String
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  role         StaffRole
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  sessions     StaffSession[]
+}
+
+model StaffSession {
+  id           String   @id @default(cuid())
+  staffId      String
+  refreshToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  staff        Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// MENU
+// ─────────────────────────────────────────────
+
+model Menu {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String   @default("Main Menu")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categories   MenuCategory[]
+}
+
+model MenuCategory {
+  id        String   @id @default(cuid())
+  menuId    String
+  name      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrl    String?
+  isVeg       Boolean  @default(true)
+  isAvailable Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  // JSON structure for modifiers:
+  // [
+  //   {
+  //     "name": "Spice Level",
+  //     "required": false,
+  //     "options": [
+  //       { "label": "Mild",   "extraPrice": 0 },
+  //       { "label": "Medium", "extraPrice": 0 },
+  //       { "label": "Hot",    "extraPrice": 0 }
+  //     ]
+  //   },
+  //   {
+  //     "name": "Add Cheese",
+  //     "required": false,
+  //     "options": [
+  //       { "label": "Yes", "extraPrice": 20 },
+  //       { "label": "No",  "extraPrice": 0  }
+  //     ]
+  //   }
+  // ]
+  modifiers   Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+}
+
+// ─────────────────────────────────────────────
+// TABLE SESSION
+// ─────────────────────────────────────────────
+
+model TableSession {
+  id           String        @id @default(cuid())
+  tableId      String
+  customerId   String
+  verifyCode   String
+  status       SessionStatus @default(PENDING_VERIFICATION)
+  verifiedAt   DateTime?
+  closedAt     DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  table        Table    @relation(fields: [tableId], references: [id])
+  customer     Customer @relation(fields: [customerId], references: [id])
+  orders       Order[]
+  payment      SessionPayment?
+}
+
+// ─────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────
+
+model Order {
+  id           String      @id @default(cuid())
+  sessionId    String?
+  customerId   String
+  restaurantId String
+  type         OrderType
+  status       OrderStatus @default(RECEIVED)
+  subtotal     Decimal     @db.Decimal(10, 2)
+  taxAmount    Decimal     @db.Decimal(10, 2) @default(0)
+  totalAmount  Decimal     @db.Decimal(10, 2)
+  tokenNumber  String?     // For takeaway only
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  session      TableSession? @relation(fields: [sessionId], references: [id])
+  customer     Customer      @relation(fields: [customerId], references: [id])
+  items        OrderItem[]
+  payment      Payment?
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  menuItemId   String
+  name         String  // Snapshot at time of order
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(10, 2)
+  totalPrice   Decimal @db.Decimal(10, 2)
+  notes        String?
+
+  // Snapshot of selected modifiers at time of order:
+  // [{ "name": "Spice Level", "option": "Hot", "extraPrice": 0 }]
+  selectedModifiers Json @default("[]")
+
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem     MenuItem @relation(fields: [menuItemId], references: [id])
+}
+
+// ─────────────────────────────────────────────
+// PAYMENTS
+// ─────────────────────────────────────────────
+
+model SessionPayment {
+  id           String        @id @default(cuid())
+  sessionId    String        @unique
+  totalAmount  Decimal       @db.Decimal(10, 2)
+  method       PaymentMethod
+  status       PaymentStatus @default(PENDING)
+  confirmedAt  DateTime?
+  confirmedBy  String?       // staffId who confirmed
+  createdAt    DateTime      @default(now())
+
+  session      TableSession @relation(fields: [sessionId], references: [id])
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  orderId      String        @unique // For takeaway only
+  amount       Decimal       @db.Decimal(10, 2)
+  method       PaymentMethod
+  status       PaymentStatus @default(PENDING)
+  confirmedAt  DateTime?
+  confirmedBy  String?
+  createdAt    DateTime      @default(now())
+
+  order        Order @relation(fields: [orderId], references: [id])
+}
+
+// ─────────────────────────────────────────────
+// QUEUE
+// ─────────────────────────────────────────────
+
+model Queue {
+  id        String      @id @default(cuid())
+  branchId  String
+  name      String
+  phone     String
+  partySize Int
+  status    QueueStatus @default(WAITING)
+  position  Int
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  branch    Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// RESERVATIONS
+// ─────────────────────────────────────────────
+
+model Reservation {
+  id           String            @id @default(cuid())
+  branchId     String
+  customerId   String
+  partySize    Int
+  date         DateTime
+  timeSlot     String            // "19:00", "19:30" etc.
+  status       ReservationStatus @default(PENDING)
+  notes        String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  branch       Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  customer     Customer @relation(fields: [customerId], references: [id])
+}
+
+// ─────────────────────────────────────────────
+// LOYALTY
+// ─────────────────────────────────────────────
+
+model LoyaltyConfig {
+  id             String  @id @default(cuid())
+  restaurantId   String  @unique
+  pointsPerHundred Decimal @db.Decimal(10, 4) @default(1)
+  isActive       Boolean @default(true)
+
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model LoyaltyAccount {
+  id           String   @id @default(cuid())
+  customerId   String   @unique
+  totalPoints  Decimal  @db.Decimal(10, 2) @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  customer     Customer             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  transactions LoyaltyTransaction[]
+}
+
+model LoyaltyTransaction {
+  id           String        @id @default(cuid())
+  accountId    String
+  restaurantId String
+  points       Decimal       @db.Decimal(10, 2)
+  type         LoyaltyTxType
+  description  String?
+  orderId      String?
+  createdAt    DateTime      @default(now())
+
+  account      LoyaltyAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// COMPLAINTS
+// ─────────────────────────────────────────────
+
+model Complaint {
+  id           String             @id @default(cuid())
+  restaurantId String
+  customerId   String?
+  orderId      String?
+  rawText      String
+  rating       Int?               // 1-5 stars
+  language     String?            // Detected by Gemini
+  category     ComplaintCategory?
+  sentiment    Sentiment?
+  summary      String?            // English summary from Gemini
+  keywords     String[]           @default([])
+  urgency      UrgencyLevel?
+  isAnalyzed   Boolean            @default(false)
+  isResolved   Boolean            @default(false)
+  resolvedAt   DateTime?
+  resolvedBy   String?            // staffId
+  createdAt    DateTime           @default(now())
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customer     Customer?  @relation(fields: [customerId], references: [id])
+}
+
+// ─────────────────────────────────────────────
+// TAX CONFIG
+// ─────────────────────────────────────────────
+
+model TaxConfig {
+  id           String  @id @default(cuid())
+  restaurantId String  @unique
+  gstPercent   Decimal @db.Decimal(5, 2) @default(5)
+  isActive     Boolean @default(true)
+
+  @@map("tax_configs")
+}
+
+// ─────────────────────────────────────────────
+// UPSELL CONFIG (optional, owner configures)
+// ─────────────────────────────────────────────
+
+model UpsellConfig {
+  id           String  @id @default(cuid())
+  restaurantId String
+  triggerPhase String  // "AFTER_STARTER" | "AFTER_MAIN"
+  promptText   String
+  menuItemId   String? // Specific item to suggest
+  isActive     Boolean @default(true)
+
+  @@map("upsell_configs")
+}
+```
+
+---
+
+## Critical Indexes
+
+```sql
+-- Run after prisma migrate
+-- Paste in Supabase SQL editor
+
+-- Orders: most frequent queries
+CREATE INDEX idx_orders_restaurant_date
+ON "Order" ("restaurantId", "createdAt" DESC);
+
+CREATE INDEX idx_orders_session
+ON "Order" ("sessionId", "status");
+
+CREATE INDEX idx_orders_active
+ON "Order" ("restaurantId", "status")
+WHERE "status" NOT IN ('DELIVERED', 'CANCELLED');
+
+-- Tables: floor plan queries
+CREATE INDEX idx_tables_floor
+ON "Table" ("floorId", "status");
+
+-- Table sessions: active session lookup
+CREATE INDEX idx_sessions_table_active
+ON "TableSession" ("tableId", "status")
+WHERE "status" != 'CLOSED';
+
+-- Menu: customer browsing
+CREATE INDEX idx_menu_items_category
+ON "MenuItem" ("categoryId", "isAvailable", "sortOrder");
+
+-- Queue: active queue per branch
+CREATE INDEX idx_queue_branch_active
+ON "Queue" ("branchId", "status", "position")
+WHERE "status" = 'WAITING';
+
+-- Reservations: date-based lookup
+CREATE INDEX idx_reservations_branch_date
+ON "Reservation" ("branchId", "date", "status");
+
+-- Complaints: admin filtering
+CREATE INDEX idx_complaints_restaurant
+ON "Complaint" ("restaurantId", "isResolved", "createdAt" DESC);
+
+-- Loyalty: customer wallet
+CREATE INDEX idx_loyalty_tx_account
+ON "LoyaltyTransaction" ("accountId", "createdAt" DESC);
+```
+
+---
+
+## Entity Relationships
+
+```
+Admin
+└── AdminSession (1:N)
+
+Customer
+├── CustomerSession (1:N)
+├── TableSession (1:N)
+├── Order (1:N)
+├── Reservation (1:N)
+├── LoyaltyAccount (1:1)
+└── Complaint (1:N)
+
+Restaurant
+├── Branch (1:N)
+│   ├── Floor (1:N)
+│   │   └── Table (1:N)
+│   │       └── TableSession (1:N)
+│   │           └── Order (1:N)
+│   │               └── OrderItem (1:N)
+│   ├── Queue (1:N)
+│   └── Reservation (1:N)
+├── Staff (1:N)
+│   └── StaffSession (1:N)
+├── Menu (1:N)
+│   └── MenuCategory (1:N)
+│       └── MenuItem (1:N)
+│           └── OrderItem (1:N)
+├── LoyaltyConfig (1:1)
+├── TaxConfig (1:1)
+├── RestaurantPhoto (1:N)
+└── Complaint (1:N)
+
+LoyaltyAccount
+└── LoyaltyTransaction (1:N)
+```
+
+---
+
+## Data Notes
+
+**Menu item modifiers (JSONB)**
+```json
+[
+  {
+    "name": "Spice Level",
+    "required": false,
+    "options": [
+      { "label": "Mild",   "extraPrice": 0 },
+      { "label": "Medium", "extraPrice": 0 },
+      { "label": "Hot",    "extraPrice": 0 }
+    ]
+  }
+]
+```
+
+**Selected modifiers on OrderItem (JSONB)**
+```json
+[
+  { "name": "Spice Level", "option": "Hot", "extraPrice": 0 }
+]
+```
+
+**Order item name snapshot**
+Always store item name at time of order. If menu changes later, historical orders still show correct name.
+
+**Token number for takeaway**
+Format: `T-{timestamp-last4}-{random3}`  
+Example: `T-4521-847`  
+Generated on order creation, never reused.

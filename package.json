@@ -1,0 +1,42 @@
+{
+  "name": "foodmart",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "npm@11.8.0",
+  "description": "Foodmart Restaurant OS Platform",
+  "workspaces": [
+    "apps/user-app",
+    "apps/partner-app",
+    "apps/admin",
+    "apps/mobile",
+    "backend",
+    "packages/*",
+    "prisma"
+  ],
+  "scripts": {
+    "dev": "npx turbo dev --filter=backend --filter=user-app",
+    "dev:partner": "npm run dev --workspace=apps/partner-app",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build": "npx turbo build",
+    "lint": "npx turbo lint",
+    "typecheck": "npx turbo typecheck",
+    "format": "npx prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:generate": "npm run generate --workspace=prisma",
+    "db:migrate": "npm run migrate --workspace=prisma",
+    "db:seed": "npm run seed --workspace=prisma"
+  },
+  "devDependencies": {
+    "@next/swc-win32-x64-msvc": "^16.2.10",
+    "autoprefixer": "^10.5.2",
+    "eslint": "^8.57.0",
+    "postcss": "^8.5.16",
+    "prettier": "^3.3.2",
+    "prisma": "^5.15.0",
+    "turbo": "^2.0.4",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@swc/helpers": "^0.5.23",
+    "zod": "^3.23.8"
+  }
+}
